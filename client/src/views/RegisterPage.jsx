@@ -9,14 +9,14 @@ import {
   Checkbox,
   FormLabel,
   FormControl,
-  FormHelperText,
   InputRightElement,
   InputGroup,
 } from '@chakra-ui/react';
 import { FiEye, FiEyeOff } from 'react-icons/fi';
+import { CheckIcon, CloseIcon } from '@chakra-ui/icons';
 import React, { useState } from 'react';
 import api from '../api';
-import Falls from '../assets/cataratas.png';
+import ColorfullStreet from '../assets/colorfulstreet.png';
 
 const blue = {
   blue1: '#fbfdff',
@@ -38,27 +38,55 @@ const RegisterPage = () => {
   const [password, setPassword] = useState('');
   const [username, setUsername] = useState('');
   const [show, setShow] = useState(false);
-  const [confirmShow, setConfirmShow] = useState(false)
-  const [message, setMessage] = useState("")
+  const [confirmShow, setConfirmShow] = useState(false);
+  const [message, setMessage] = useState('');
+  const [validatePassword, setValidatePassword] = useState({
+    case: false,
+    number: false,
+    length: false,
+    special: false,
+  });
   const handleClick = () => setShow(!show);
-  const handleClickConfirmShow = () => setConfirmShow(!confirmShow)
+  const handleClickConfirmShow = () => setConfirmShow(!confirmShow);
 
+  
   const emailValidation = () => {
-    const regex = /^(([^<>()[\].,;:\s@"]+(\.[^<>()[\].,;:\s@"]+)*)|(".+"))@(([^<>()[\].,;:\s@"]+\.)+[^<>()[\].,;:\s@"]{2,})$/i;
-    if (!regex.test(email) && email !== "") {
-      setMessage("E-mail inválido")
+    const regex =
+    /^(([^<>()[\].,;:\s@"]+(\.[^<>()[\].,;:\s@"]+)*)|(".+"))@(([^<>()[\].,;:\s@"]+\.)+[^<>()[\].,;:\s@"]{2,})$/i;
+    if (!regex.test(email) && email !== '') {
+      setMessage('E-mail inválido');
     } else {
-      setMessage("")
+      setMessage('');
     }
-  }
+  };
   const handleEmail = (e) => {
-    setEmail(e.target.value)
-    emailValidation()
-  }
+    setEmail(e.target.value);
+    emailValidation();
+  };
+  
+  const secureText = (password) => {
+    let newPassword = password.target.value;
+    setPassword(newPassword);
+    console.log(newPassword.length);
+    const regexUppercase = new RegExp(/^(?=.*[A-Z]).+$/);
+    const regexLowercase = new RegExp(/^(?=.*[a-z]).+$/);
+    const regexNumber = new RegExp(/^(?=.*[0-9]).+$/);
+    const length = newPassword.length >= 8;
+    const regexSpecial = new RegExp(/[^a-zA-Z 0-9]+/g);
+
+    setValidatePassword({
+      case:
+        regexUppercase.test(newPassword) && regexLowercase.test(newPassword),
+      number: regexNumber.test(newPassword),
+      length,
+      special: regexSpecial.test(newPassword),
+    });
+  };
+
 
   const registerUser = async (e) => {
-    e.preventDefault()
-    console.log("clicado")
+    e.preventDefault();
+    console.log('clicado');
     try {
       const response = await api.post('//localhost:5000/register', {
         email,
@@ -71,16 +99,16 @@ const RegisterPage = () => {
       if (error.response.status === 401) {
         alert('Invalid credentials');
       }
-      console.log(error)
+      console.log(error);
     }
-   };
+  };
 
   return (
     <Box
       bg={blue.blue4}
       display={'grid'}
       gridTemplateColumns={'repeat(2, 1fr)'}>
-      <Container maxW={'500px'} mt={'3rem'}>
+      <Container maxW={'500px'} m={'3rem 0 3rem 8rem'}>
         <Text marginBottom={'1rem'} fontSize={'3xl'}>
           Cadastre-se, colabore e conheça rotas variadas pelo Brasil
         </Text>
@@ -112,17 +140,18 @@ const RegisterPage = () => {
               value={email}
               onChange={handleEmail}
               bg={'white'}
-              
-              margin={"0"}
+              margin={'0'}
               isRequired={true}
             />
-            <small>{email.length === 0 ? "" : message}</small>
-            <FormLabel mt={".8rem"}>Cadastre sua senha </FormLabel>
+            <small style={{ color: 'red' }}>
+              {email.length === 0 ? '' : message}
+            </small>
+            <FormLabel mt={'.8rem'}>Cadastre sua senha </FormLabel>
             <InputGroup>
               <Input
                 value={password}
                 type={show ? 'text' : 'password'}
-                onChange={(e) => setPassword(e.target.value)}
+                onChange={secureText}
                 bg={'white'}
                 mb={'.8rem'}
                 isRequired={true}
@@ -137,7 +166,53 @@ const RegisterPage = () => {
                 </Button>
               </InputRightElement>
             </InputGroup>
-            <FormLabel>Confirme a senha </FormLabel>
+            <Text fontSize={'15px'}>Sua senha deve ter:</Text>
+            <Flex flexDirection={'row'} mt={'.5rem'} alignItems={'center'}>
+              {validatePassword.length ? (
+                <CheckIcon fontSize={'12px'} color={'green'} ml={'20px'} />
+              ) : (
+                <CloseIcon
+                  padding={'0'}
+                  fontSize={'12px'}
+                  color={'red'}
+                  ml={'20px'}
+                />
+              )}
+              <Text fontSize={'14px'} ml={'20px'}>
+                No mínimo 8 caractéres
+              </Text>
+            </Flex>
+            <Flex flexDirection={'row'} alignItems={'center'}>
+              {validatePassword.number ? (
+                <CheckIcon fontSize={'12px'} color={'green'} ml={'20px'} />
+              ) : (
+                <CloseIcon fontSize={'12px'} color={'red'} ml={'20px'} />
+              )}
+              <Text fontSize={'14px'} ml={'20px'}>
+                Pelo menos um número
+              </Text>
+            </Flex>
+            <Flex flexDirection={'row'} alignItems={'center'}>
+              {validatePassword.case ? (
+                <CheckIcon fontSize={'12px'} color={'green'} ml={'20px'} />
+              ) : (
+                <CloseIcon fontSize={'12px'} color={'red'} ml={'20px'} />
+              )}
+              <Text fontSize={'14px'} ml={'20px'}>
+                Pelo menos uma letra maiúscula e uma minúscula
+              </Text>
+            </Flex>
+            <Flex flexDirection={'row'} alignItems={'center'}>
+              {validatePassword.special ? (
+                <CheckIcon fontSize={'12px'} color={'green'} ml={'20px'} />
+              ) : (
+                <CloseIcon fontSize={'12px'} color={'red'} ml={'20px'} />
+              )}
+              <Text fontSize={'14px'} ml={'20px'}>
+                Pelo menos um caractére especial
+              </Text>
+            </Flex>
+            <FormLabel mt={'1rem'}>Confirme a senha </FormLabel>
             <InputGroup>
               <Input
                 type={confirmShow ? 'text' : 'password'}
@@ -163,7 +238,7 @@ const RegisterPage = () => {
             </Checkbox>
             <Flex flexDirection={'row'} justifyContent={'center'}>
               <Button
-                mt={'2rem'}
+                mt={'3rem'}
                 bg={blue.blue10}
                 color="white"
                 padding={'1rem 13rem'}
@@ -175,7 +250,7 @@ const RegisterPage = () => {
           </form>
         </FormControl>
       </Container>
-      <img src={Falls} alt="main" style={{ minHeight: '100vh' }} />
+      <Container maxWidth='100%' backgroundImage={ColorfullStreet} bgSize="cover" bg></Container>
     </Box>
   );
 };
