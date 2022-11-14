@@ -104,10 +104,7 @@ const RegisterPage = () => {
   };
 
   return (
-    <Box
-      bg={blue.blue4}
-      display={'grid'}
-      gridTemplateColumns={'repeat(2, 1fr)'}>
+    <Box bg={'#cffafe'} display={'grid'} gridTemplateColumns={'repeat(2, 1fr)'}>
       <Container maxW={'500px'} m={'3rem 0 3rem 8rem'}>
         <Text marginBottom={'1rem'} fontSize={'3xl'}>
           Cadastre-se, colabore e conheça rotas variadas pelo Brasil
@@ -250,7 +247,11 @@ const RegisterPage = () => {
           </form>
         </FormControl>
       </Container>
-      <Container maxWidth='100%' backgroundImage={ColorfullStreet} bgSize="cover" bg></Container>
+      <Container
+        maxWidth="100%"
+        backgroundImage={ColorfullStreet}
+        bgSize="cover"
+        bg></Container>
     </Box>
   );
 };
